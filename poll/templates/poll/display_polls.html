@@ -1,0 +1,31 @@
+{% extends 'poll/base.html' %}
+
+
+{% block content %}
+
+  <div class="container mt-5">
+    <!-- Poll Card -->
+    {% for poll in polls %}
+    <div class="card poll-card shadow-sm mb-4 d-flex flex-column">
+      <div class="card-body d-flex flex-column">
+        <!-- Poll Title -->
+        <h3 class="card-title text-primary">{{ poll.text }}</h3>
+        <!-- Poll Creator -->
+        <h6 class="card-subtitle mb-4">Created by: <strong>{{ poll.owner.username }}</strong></h6>
+        <!-- Poll Choices -->
+        <div class="list-group d-flex flex-column gap-2">
+          {% for choice in poll.get_vote_count %}
+          <button type="button" class="list-group-item list-group-item-action">
+            {{ choice }}
+          </button>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="card-footer mt-auto text-end">
+        <small class="text-muted">Poll ends on: 2025-01-31</small>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+{% endblock content %}

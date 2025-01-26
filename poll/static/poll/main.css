@@ -1,0 +1,32 @@
+.container {
+    padding: 10px;
+}
+
+body {
+    background-color: #f8f9fa;
+}
+.poll-card {
+    border: 1px solid #e1e1e1;
+    border-radius: 12px;
+}
+.poll-card .card-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+.poll-card .card-subtitle {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+.poll-card .list-group-item {
+    background-color: #ffffff;
+    border: 1px solid #e1e1e1;
+    transition: all 0.3s ease-in-out;
+}
+.poll-card .list-group-item:hover {
+    background-color: #e9ecef;
+    border-color: #adb5bd;
+}
+.poll-card .card-footer {
+    background-color: #f1f3f5;
+    font-size: 0.85rem;
+}

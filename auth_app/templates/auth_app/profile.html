@@ -1,0 +1,41 @@
+{% extends 'poll/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <h1>Welcome, {{ user.username }}!</h1>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Profile</h5>
+                    <p class="card-text">Here is your profile information:</p>
+                    
+                    {% if user.profile.profile_picture %}
+                        <ul class="list-group">
+                            <li class="list-group-item"><strong>Profile Picture</strong> <img class="profile-picture" src="{{ user.profile.profile_picture.url }}" alt="Profile Picture"></li>
+                        </ul>
+                    {% endif %}
+                    <li class="list-group-item"><strong>Username:</strong> {{ user.username }}</li>
+                    
+                    <form enctype="multipart/form-data" method="POST">
+                        {% csrf_token %}
+                        {{ user_form|crispy }}
+                        {{ form|crispy }}
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                    <div class="form-group">
+                        <div class="btn-group" role="group"></div>
+                            <a href="{% url 'password_reset' %}" class="btn btn-primary pr-btn">Change Password</a>
+                            <a href="{% url 'logout' %}" class="btn btn-primary pr-btn">Log Out</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
