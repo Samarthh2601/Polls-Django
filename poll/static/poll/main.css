@@ -22,10 +22,18 @@ body {
     border: 1px solid #e1e1e1;
     transition: all 0.3s ease-in-out;
 }
+
 .poll-card .list-group-item:hover {
     background-color: #e9ecef;
     border-color: #adb5bd;
 }
+
+.poll-card .list-group-item.selected {
+    background-color: #198754;
+    color: white;
+    border-color: #146c43;
+}
+
 .poll-card .card-footer {
     background-color: #f1f3f5;
     font-size: 0.85rem;

@@ -8,17 +8,31 @@
     {% for poll in polls %}
     <div class="card poll-card shadow-sm mb-4 d-flex flex-column">
       <div class="card-body d-flex flex-column">
+        <form action="{% url 'vote' %}" method="post">
+          {% csrf_token %}
         <!-- Poll Title -->
         <h3 class="card-title text-primary">{{ poll.text }}</h3>
         <!-- Poll Creator -->
         <h6 class="card-subtitle mb-4">Created by: <strong>{{ poll.owner.username }}</strong></h6>
         <!-- Poll Choices -->
         <div class="list-group d-flex flex-column gap-2">
-          {% for choice in poll.get_vote_count %}
-          <button type="button" class="list-group-item list-group-item-action">
-            {{ choice }}
-          </button>
+          
+            <div class="list-group">
+              {% for choice in poll.get_vote_count %} 
+              <!-- Poll Choice button loop -->
+              <button type="button" class="list-group-item list-group-item-action choice-btn btn" 
+                      onclick="selectChoice('{{ choice }}', this, '{{ poll.pk }}')"> 
+                  {{ choice }}
+              </button>
           {% endfor %}
+          </div>
+          
+          <!-- Hidden input with unique ID -->
+          <input type="hidden" name="selected_choice" id="selectedChoice-{{ poll.pk }}">
+          <input type="hidden" name="poll_key" value="{{ poll.pk }}">
+          <button type="submit" class="btn btn-primary mt-2">Vote</button>
+          </form>
+          
         </div>
       </div>
       <div class="card-footer mt-auto text-end">
@@ -27,5 +41,22 @@
     </div>
     {% endfor %}
   </div>
+
+  <script>
+    function selectChoice(choice, button, pollId) {
+    // Set the value of poll ID hidden input to clicked choice's poll ID
+    document.getElementById(`selectedChoice-${pollId}`).value = choice; 
+
+    // Get all choice of parent form
+    let choiceButtons = button.closest('form').querySelectorAll('.choice-btn');
+
+    // Remove other selected options (Check for multiple choices later)
+    choiceButtons.forEach(btn => btn.classList.remove('selected'));
+
+    button.classList.add('selected');
+}
+
+
+</script>
 
 {% endblock content %}
