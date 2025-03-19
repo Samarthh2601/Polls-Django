@@ -1,0 +1,40 @@
+{% extends 'poll/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Poll Card -->
+    {% for choice_id, choice in choices.items %}
+    <div class="card poll-card shadow-sm mb-4 d-flex flex-column">
+      <div class="card-body d-flex flex-column">
+        <form action="{% url 'my_votes' %}" method="post">
+          {% csrf_token %}
+        <!-- Poll Title -->
+        <h3 class="card-title text-primary">{{ choice.poll.text }}</h3>
+        <!-- Poll Creator -->
+        <h6 class="card-subtitle mb-4">Created by: <strong>{{ choice.poll.owner.username }}</strong></h6>
+        <!-- Poll Choices -->
+        <div class="list-group d-flex flex-column gap-2">
+          
+            <div class="list-group"> 
+              <button type="button" class="list-group-item list-group-item-action choice-btn btn"> 
+                  {{ choice }}
+              </button>    
+          </div>
+          
+          <!-- Hidden input with unique ID -->
+          <input type="hidden" name="selected_choice" value="{{ choice }}">
+          <input type="hidden" name="selected_choice_id" value="{{ choice_id }}">
+          <input type="hidden" name="poll_key" value="{{ choice.poll.pk }}">
+          <button type="submit" class="btn btn-danger mt-2">Delete</button>
+          </form>
+          
+        </div>
+      </div>
+      <div class="card-footer mt-auto text-end">
+        <small class="text-muted">Poll ends at: {{ choice.poll.end_date }} (UTC)</small>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% endblock %}

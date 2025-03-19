@@ -6,6 +6,27 @@ from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
+def get_choice_obj(request: HttpRequest, use_id=False):
+    choice_voted = request.POST.get("selected_choice") # Get the selected choice text from the hidden input [poll/display_polls.html]
+    key = request.POST.get("poll_key") #Get the primary key of the selected poll from the hidden input [poll/display_polls.html]
+    choice_id = request.POST.get("selected_choice_id")
+
+    poll = Poll.objects.get(pk=key) 
+
+    if not poll:
+        messages.error(request, "Error occurred. Please ensure that the poll exists.")
+        return False
+        
+    if poll.end_date <= timezone.now():
+        messages.error(request, "Poll has already ended.")
+        return False
+    
+    if use_id is True:
+        choice = Choice.objects.get(pk=choice_id) # Get selected choice object from db
+    else: choice = Choice.objects.get(text=choice_voted, poll=poll)
+
+    return choice
+
 
 # Displays all the polls from the database
 @login_required
@@ -55,21 +76,32 @@ def my_polls(request: HttpRequest):
     return render(request, 'poll/display_polls.html', context={"polls": polls})
 
 def add_vote(request: HttpRequest):
-    choice_voted = request.POST.get("selected_choice") # Get the selected choice text from the hidden input [poll/display_polls.html]
-    key = request.POST.get("poll_key") #Get the primary key of the selected poll from the hidden input [poll/display_polls.html]
-
-    poll = Poll.objects.get(pk=key) 
-
-    if not poll:
-        messages.error(request, "Error occurred. Please ensure that the poll exists.")
-        return redirect("display_polls")
-        
-    if poll.end_date <= timezone.now():
-        messages.error(request, "Poll has already ended.")
-        return redirect("display_polls")
-
-    choice = Choice.objects.filter(text=choice_voted, poll=poll) # Get selected choice object from db
-    Vote.objects.create(choice=choice, user=request.user)
+    choice = get_choice_obj(request)
+    if choice is False:
+        return redirect("display_polls")    
+    
+    Vote.objects.get_or_create(choice=choice, user=request.user)
 
     messages.success(request, "Successfully voted!")
     return redirect("display_polls")
+
+@login_required
+def my_votes(request: HttpRequest):
+    if request.method == "GET":
+        votes = Vote.objects.filter(user=request.user)    
+        if not votes.exists():
+            messages.error(request, "You have not voted yet!")
+            return redirect("display_polls")
+
+        choices = {vote.choice.pk: vote.choice for vote in votes}
+        return render(request, 'poll/my_votes.html', context={"choices": choices})
+    
+    choice = get_choice_obj(request, use_id=True)
+
+    if choice is False:
+        return redirect("my_votes")
+    
+    vote = Vote.objects.get(choice=choice, user=request.user)
+    vote.delete()
+    messages.success(request, "Successfully deleted!")
+    return redirect("my_votes")
