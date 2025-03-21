@@ -18,17 +18,18 @@
         <div class="list-group d-flex flex-column gap-2">
           
             <div class="list-group">
-              {% for choice in poll.get_vote_count %} 
+              {% for choice_id, value in poll.get_vote_count.items %} 
               <!-- Poll Choice button loop -->
               <button type="button" class="list-group-item list-group-item-action choice-btn btn" 
-                      onclick="selectChoice('{{ choice }}', this, '{{ poll.pk }}')"> 
-                  {{ choice }}
+                      onclick="selectChoice('{{ choice_id }}', this, '{{ poll.pk }}')"> 
+                  {{ value.0 }}
               </button>
           {% endfor %}
           </div>
           
           <!-- Hidden input with unique ID -->
-          <input type="hidden" name="selected_choice" id="selectedChoice-{{ poll.pk }}">
+          <input type="hidden" name="selected_choice_id" id="selectedChoice-{{ poll.pk }}">
+          <!-- Add the ID and fix in script tags -->
           <input type="hidden" name="poll_key" value="{{ poll.pk }}">
           <button type="submit" class="btn btn-primary mt-2">Vote</button>
           </form>

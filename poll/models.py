@@ -22,7 +22,7 @@ class Poll(models.Model):
 
     def get_vote_count(self) -> dict:
         choices_with_vote_counts = self.choices.annotate(vote_count=Count('votes'))
-        result = {choice.text: choice.vote_count for choice in choices_with_vote_counts}
+        result = {str(choice.pk): [choice.text, choice.vote_count] for choice in choices_with_vote_counts}
         return result
     
     def update_inactive(self, save: bool = False) -> bool:

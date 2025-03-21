@@ -10,6 +10,10 @@ def get_choice_obj(request: HttpRequest, use_id=False):
     choice_voted = request.POST.get("selected_choice") # Get the selected choice text from the hidden input [poll/display_polls.html]
     key = request.POST.get("poll_key") #Get the primary key of the selected poll from the hidden input [poll/display_polls.html]
     choice_id = request.POST.get("selected_choice_id")
+    print("-----------------------------------------------------------")
+    print(choice_id)
+    print("-----------------------------------------------------------")
+
 
     poll = Poll.objects.get(pk=key) 
 
@@ -23,7 +27,7 @@ def get_choice_obj(request: HttpRequest, use_id=False):
     
     if use_id is True:
         choice = Choice.objects.get(pk=choice_id) # Get selected choice object from db
-    else: choice = Choice.objects.get(text=choice_voted, poll=poll)
+    else: choice = Choice.objects.get(pk=choice_voted, poll=poll)
 
     return choice
 
@@ -76,7 +80,8 @@ def my_polls(request: HttpRequest):
     return render(request, 'poll/display_polls.html', context={"polls": polls})
 
 def add_vote(request: HttpRequest):
-    choice = get_choice_obj(request)
+    choice = get_choice_obj(request, use_id=True)
+
     if choice is False:
         return redirect("display_polls")    
     
