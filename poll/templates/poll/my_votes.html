@@ -25,7 +25,7 @@
           <input type="hidden" name="selected_choice" value="{{ choice }}">
           <input type="hidden" name="selected_choice_id" value="{{ choice_id }}">
           <input type="hidden" name="poll_key" value="{{ choice.poll.pk }}">
-          <button type="submit" class="btn btn-danger mt-2">Delete</button>
+          <button type="submit" class="btn btn-danger mt-2"  onclick="return confirm('Are you sure you want to delete this vote?');">Delete</button>
           </form>
           
         </div>

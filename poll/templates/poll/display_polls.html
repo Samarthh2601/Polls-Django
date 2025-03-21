@@ -31,9 +31,10 @@
           <input type="hidden" name="selected_choice_id" id="selectedChoice-{{ poll.pk }}">
           <!-- Add the ID and fix in script tags -->
           <input type="hidden" name="poll_key" value="{{ poll.pk }}">
+          
           <button type="submit" class="btn btn-primary mt-2">Vote</button>
           </form>
-          
+          {% block ext %}{% endblock ext %}
         </div>
       </div>
       <div class="card-footer mt-auto text-end">

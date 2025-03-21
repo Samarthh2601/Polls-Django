@@ -6,14 +6,10 @@ from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
-def get_choice_obj(request: HttpRequest, use_id=False):
+def get_choice_obj(request: HttpRequest, use_id=True):
     choice_voted = request.POST.get("selected_choice") # Get the selected choice text from the hidden input [poll/display_polls.html]
     key = request.POST.get("poll_key") #Get the primary key of the selected poll from the hidden input [poll/display_polls.html]
     choice_id = request.POST.get("selected_choice_id")
-    print("-----------------------------------------------------------")
-    print(choice_id)
-    print("-----------------------------------------------------------")
-
 
     poll = Poll.objects.get(pk=key) 
 
@@ -77,10 +73,24 @@ def my_polls(request: HttpRequest):
         messages.warning(request, "You have not created any polls yet")
         return redirect("create_poll")
 
-    return render(request, 'poll/display_polls.html', context={"polls": polls})
+    return render(request, 'poll/my_polls.html', context={"polls": polls})
+
+@login_required
+def delete_poll(request: HttpRequest):
+    poll_key = request.GET.get("poll_key")
+    if poll_key is None:
+        messages.error(request, "Invalid poll detected")
+        return redirect("my_polls")
+    
+    poll = Poll.objects.get(pk=poll_key)
+    if poll.owner != request.user:
+        messages.error("You are not the owner of that poll")
+        return redirect("display_polls")
+    poll.delete()
+    return redirect("my_polls")
 
 def add_vote(request: HttpRequest):
-    choice = get_choice_obj(request, use_id=True)
+    choice = get_choice_obj(request)
 
     if choice is False:
         return redirect("display_polls")    
@@ -101,7 +111,7 @@ def my_votes(request: HttpRequest):
         choices = {vote.choice.pk: vote.choice for vote in votes}
         return render(request, 'poll/my_votes.html', context={"choices": choices})
     
-    choice = get_choice_obj(request, use_id=True)
+    choice = get_choice_obj(request)
 
     if choice is False:
         return redirect("my_votes")
