@@ -41,8 +41,8 @@ INSTALLED_APPS = [
     'poll.apps.PollConfig',
     'auth_app.apps.AuthAppConfig',
     'crispy_forms',
+    'crispy_bootstrap5',
     'django_fastdev',
-    'crispy_bootstrap5'
 ]
 
 MIDDLEWARE = [
@@ -130,7 +130,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
-LOGIN_REDIRECT_URL = 'home'
+LOGIN_REDIRECT_URL = '/'
 
 LOGIN_URL = 'login'
 

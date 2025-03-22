@@ -32,7 +32,7 @@
           <!-- Add the ID and fix in script tags -->
           <input type="hidden" name="poll_key" value="{{ poll.pk }}">
           
-          <button type="submit" class="btn btn-primary mt-2">Vote</button>
+          <button type="submit" class="btn btn-primary mt-2 vote-btn">Vote</button>
           </form>
           {% block ext %}{% endblock ext %}
         </div>
@@ -57,8 +57,6 @@
 
     button.classList.add('selected');
 }
-
-
 </script>
 
 {% endblock content %}

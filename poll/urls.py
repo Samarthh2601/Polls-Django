@@ -7,5 +7,6 @@ urlpatterns = [
     path('my/', views.my_polls, name='my_polls'),
     path('add_vote/', views.add_vote, name='vote'),
     path('my_votes/', views.my_votes, name="my_votes"),
-    path('delete/', views.delete_poll, name="delete_poll")
+    path('delete/', views.delete_poll, name="delete_poll"),
+    path('edit/', views.edit_poll, name="edit_poll"),
 ]

@@ -2,12 +2,10 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-
-
 <div class="container">
     <div class="row">
         <div class="col-md-6 offset-md-3">
-            <h1>Welcome, {{ user.username }}!</h1>
+            <h1>Welcome, {{ user.username }}</h1>
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Profile</h5>
@@ -15,10 +13,10 @@
                     
                     {% if user.profile.profile_picture %}
                         <ul class="list-group">
-                            <li class="list-group-item"><strong>Profile Picture</strong> <img class="profile-picture" src="{{ user.profile.profile_picture.url }}" alt="Profile Picture"></li>
+                            <li class="list-group-item"><strong>Profile Picture</strong></li>
+                                <img class="profile-picture" src="{{ user.profile.profile_picture.url }}" alt="Profile Picture">
                         </ul>
                     {% endif %}
-                    <li class="list-group-item"><strong>Username:</strong> {{ user.username }}</li>
                     
                     <form enctype="multipart/form-data" method="POST">
                         {% csrf_token %}
