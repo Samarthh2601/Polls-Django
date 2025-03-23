@@ -11,3 +11,4 @@ class PollUpdateForm(forms.ModelForm):
     class Meta:
         model = Poll
         fields = ['text', 'active', 'end_date']
+    

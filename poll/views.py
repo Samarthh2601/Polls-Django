@@ -160,9 +160,13 @@ def add_vote(request: HttpRequest):
 
     if choice is False:
         return redirect("display_polls") # If choice is not found in the database 
+
+    check = Vote.objects.filter(user=request.user, poll=choice.poll)
+    if check:
+        messages.error(request, "You have already voted in this poll. To vote again, please delete the current vote")
+        return redirect("display_polls")
     
-    
-    Vote.objects.get_or_create(choice=choice, user=request.user) #Prevents multiple votes from the same user
+    Vote.objects.create(choice=choice, user=request.user, poll=choice.poll) #Prevents multiple votes from the same user
 
     messages.success(request, "Successfully voted!")
     return redirect("display_polls")
