@@ -6,7 +6,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
 from .models import Poll, Choice, Vote
-from .forms import PollUpdateForm
+from .forms import PollUpdateForm, ChoiceUpdateForm
+from django.forms import modelformset_factory
 
 from datetime import datetime
 
@@ -37,16 +38,18 @@ def get_choice_obj(request: HttpRequest, use_id=True):
 
     return choice
 
-def poll_auth_check(request, poll_key: int, poll: Poll) -> bool:
+def get_valid_poll(request, poll_key: int) -> Poll | bool:
     if poll_key is None:
         messages.error(request, "Invalid poll detected")
         return False
+
+    poll = Poll.objects.get(pk=poll_key)
 
     if poll.owner != request.user: #Check owner
         messages.error("You are not the owner of that poll")
         return False
     
-    return True
+    return poll
 
 # ---------------------------------------------------------------------
 # POLL CRUD VIEWS
@@ -90,35 +93,43 @@ def create_poll(request: HttpRequest):
 @login_required
 def edit_poll(request: HttpRequest):
     poll_key = request.GET.get("poll_key") #Get the poll id from my_polls.html
-    poll = Poll.objects.get(pk=poll_key)
+    poll = get_valid_poll(request, poll_key)
 
-    if (poll_auth_check(request, poll_key, poll)) is False:
+    if poll is False:
         return redirect("my_polls")
 
+    choices = Choice.objects.filter(poll=poll)
+    ChoiceFormSet = modelformset_factory(Choice, form=ChoiceUpdateForm, extra=0)
+
     if request.method == "GET":
-        return render(request, 'poll/edit_poll.html', {'form': PollUpdateForm(instance=poll)})
+        formset = ChoiceFormSet(queryset=choices)
+        return render(request, 'poll/edit_poll.html', {'form': PollUpdateForm(instance=poll), 'formset': formset})
     
+
     form = PollUpdateForm(request.POST, instance=poll)
-    if form.is_valid():
+    formset = ChoiceFormSet(request.POST, queryset=choices)
+
+    if form.is_valid() and formset.is_valid():
         form.save()
+        formset.save()
         messages.success(request, f'Poll updated!')
-        return redirect('my_polls')
+        return redirect("my_polls")
+        
     else:
         messages.warning(request, form.errors)
         return redirect('my_polls')
 
+
 @login_required
 def delete_poll(request: HttpRequest):
     poll_key = request.GET.get("poll_key") #Get the poll id from my_polls.html
+    poll = get_valid_poll(request, poll_key)
 
-    poll = Poll.objects.get(pk=poll_key)
-    
-    if (poll_auth_check(request, poll_key, poll)) is False:
+    if poll is False:
         return redirect("my_polls")
 
     poll.delete()
     return redirect("my_polls")
-
 
 
 # --------------USER SPECIFIC VIEWS-------------------------

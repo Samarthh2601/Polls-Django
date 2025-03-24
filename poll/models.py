@@ -35,7 +35,7 @@ class Poll(models.Model):
 
 class Choice(models.Model):
     poll = models.ForeignKey(Poll, on_delete=models.CASCADE, related_name='choices')
-    text = models.CharField(max_length=255)
+    text = models.CharField(max_length=512)
     created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self) -> str:
