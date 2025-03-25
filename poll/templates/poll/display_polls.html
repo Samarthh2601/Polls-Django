@@ -29,12 +29,17 @@
           
           <!-- Hidden input with unique ID -->
           <input type="hidden" name="selected_choice_id" id="selectedChoice-{{ poll.pk }}">
-          <!-- Add the ID and fix in script tags -->
           <input type="hidden" name="poll_key" value="{{ poll.pk }}">
-          
-          <button type="submit" class="btn btn-primary mt-2 vote-btn">Vote</button>
+
+
+          <button type="submit" class="btn btn-primary mt-2 vote-btn" disabled>Vote</button>
+    
           </form>
+          <!-- Button to remove the selected choice -->
+          <button type="button" class="btn btn-outline-dark mt-2" onclick="removeSelected(this, '{{ poll.pk }}')">Clear</button>
+
           {% block ext %}{% endblock ext %}
+
         </div>
       </div>
       <div class="card-footer mt-auto text-end">
@@ -47,15 +52,34 @@
   <script>
     function selectChoice(choice, button, pollId) {
     // Set the value of poll ID hidden input to clicked choice's poll ID
-    document.getElementById(`selectedChoice-${pollId}`).value = choice; 
+    document.getElementById(`selectedChoice-${pollId}`).value = choice;
 
-    // Get all choice of parent form
-    let choiceButtons = button.closest('form').querySelectorAll('.choice-btn');
-
-    // Remove other selected options (Check for multiple choices later)
+    // Get all choice buttons within the same form
+    let form = button.closest('form');
+    let choiceButtons = form.querySelectorAll('.choice-btn');
+    let voteButton = form.querySelector('.vote-btn');
+    
     choiceButtons.forEach(btn => btn.classList.remove('selected'));
-
+    
+    // Add 'selected' class to the clicked button
     button.classList.add('selected');
+    
+    voteButton.disabled = false;
+}
+
+function removeSelected(button) {
+    let form = button.closest('form');
+    let choiceButtons = form.querySelectorAll('.choice-btn');
+    let voteButton = form.querySelector('.vote-btn');
+    
+    // Remove 'selected' class from all buttons
+    choiceButtons.forEach(btn => btn.classList.remove('selected'));
+    
+    let pollId = form.querySelector('input[name="poll_key"]').value;
+    document.getElementById(`selectedChoice-${pollId}`).value = '';
+    
+    // Disable the vote button
+    voteButton.disabled = true;
 }
 </script>
 

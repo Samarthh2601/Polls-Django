@@ -10,6 +10,7 @@
 #### ~~Show vote count with choices~~
 #### ~~Restrict user from voting multiple choices in one poll~~
 #### ~~Add Choice editing~~
-#### Allow multiple selections for applicable polls
-#### Disable the polls marked as inactive and hiding expired polls
+#### ~~Disable the polls marked as inactive and hiding expired polls~~
+#### Add Pagination
 #### Create a new view and template to display final vote data to the poll owner once the poll ends
+#### Searching for polls

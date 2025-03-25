@@ -30,6 +30,8 @@ def get_choice_obj(request: HttpRequest, use_id=True):
 
     if poll.end_date <= timezone.now():
         messages.error(request, "Poll has already ended.")
+        poll.active = False
+        poll.save()
         return False
     
     if use_id is True:
@@ -57,7 +59,13 @@ def get_valid_poll(request, poll_key: int) -> Poll | bool:
 
 @login_required
 def display_polls(request: HttpRequest):
-    return render(request, 'poll/display_polls.html', context={"polls": Poll.objects.all()})
+    polls = list(reversed(Poll.get_polls())) #Reversing the list to make new polls appear on top
+    return render(request, 'poll/display_polls.html', context={"polls": polls, "expired": False})
+
+@login_required
+def display_expired_polls(request: HttpRequest):
+    polls = polls = list(reversed(Poll.get_polls(active=False)))
+    return render(request, 'poll/display_polls.html', context={"polls": polls, "expired": True})
 
 
 @login_required

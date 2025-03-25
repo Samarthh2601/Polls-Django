@@ -9,7 +9,6 @@ class Poll(models.Model):
     text = models.CharField(max_length=512)
     pub_date = models.DateTimeField(default=timezone.now)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
-    active = models.BooleanField(default=True)
     end_date = models.DateTimeField()
 
     
@@ -25,13 +24,12 @@ class Poll(models.Model):
         result = {str(choice.pk): [choice.text, choice.vote_count] for choice in choices_with_vote_counts}
         return result
     
-    def update_inactive(self, save: bool = False) -> bool:
-        if self.end_date <= timezone.now():
-            self.active = False
-        if save is True:
-            Poll.save(self)
-        return self.active
-
+    @staticmethod
+    def get_polls(active=True):
+        if active is True:
+            return Poll.objects.filter(end_date__gt=timezone.now())
+        return Poll.objects.filter(end_date__lt=timezone.now())
+    
 
 class Choice(models.Model):
     poll = models.ForeignKey(Poll, on_delete=models.CASCADE, related_name='choices')

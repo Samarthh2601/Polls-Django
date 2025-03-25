@@ -9,4 +9,5 @@ urlpatterns = [
     path('my_votes/', views.my_votes, name="my_votes"),
     path('delete/', views.delete_poll, name="delete_poll"),
     path('edit/', views.edit_poll, name="edit_poll"),
+    path('expired/', views.display_expired_polls, name="expired_polls"),
 ]
