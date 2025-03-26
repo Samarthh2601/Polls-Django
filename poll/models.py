@@ -15,9 +15,6 @@ class Poll(models.Model):
     def __str__(self) -> str:
         return self.text
 
-    @property
-    def is_active(self) -> bool:
-        return self.active
 
     def get_vote_count(self) -> dict:
         choices_with_vote_counts = self.choices.annotate(vote_count=Count('votes'))

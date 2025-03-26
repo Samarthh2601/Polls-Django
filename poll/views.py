@@ -10,6 +10,7 @@ from .forms import PollUpdateForm, ChoiceUpdateForm
 from django.forms import modelformset_factory
 
 from datetime import datetime
+from django.core.paginator import Paginator
 
 
 
@@ -59,13 +60,18 @@ def get_valid_poll(request, poll_key: int) -> Poll | bool:
 
 @login_required
 def display_polls(request: HttpRequest):
-    polls = list(reversed(Poll.get_polls())) #Reversing the list to make new polls appear on top
-    return render(request, 'poll/display_polls.html', context={"polls": polls, "expired": False})
+    polls = (Poll.get_polls().order_by("-pub_date")) #Reversing the list to make new polls appear on top
+
+    paginator = Paginator(polls, 6)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'poll/display_polls.html', context={"page_obj": page_obj})
 
 @login_required
 def display_expired_polls(request: HttpRequest):
     polls = polls = list(reversed(Poll.get_polls(active=False)))
-    return render(request, 'poll/display_polls.html', context={"polls": polls, "expired": True})
+    return render(request, 'poll/display_polls.html', context={"polls": polls})
 
 
 @login_required
@@ -82,7 +88,7 @@ def create_poll(request: HttpRequest):
 
         try:
             # Parse and validate the deadline
-            deadline = datetime.strptime(deadline, "%Y-%m-%dT%H:%M")
+            deadline = timezone.make_aware(datetime.strptime(deadline, "%Y-%m-%dT%H:%M"))
 
         except ValueError as e:
             messages.error(request, "Invalid deadline!")
@@ -145,12 +151,17 @@ def delete_poll(request: HttpRequest):
 @login_required
 def my_polls(request: HttpRequest):
     # Get filtered polls
-    polls = Poll.objects.filter(owner=request.user)
+    polls = Poll.objects.filter(owner=request.user).order_by('-pub_date')
+
     if not polls:
         messages.warning(request, "You have not created any polls yet")
         return redirect("create_poll")
 
-    return render(request, 'poll/my_polls.html', context={"polls": polls})
+    paginator = Paginator(polls, 6)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'poll/my_polls.html', context={"page_obj": page_obj})
 
 @login_required
 def my_votes(request: HttpRequest):
@@ -161,7 +172,12 @@ def my_votes(request: HttpRequest):
             return redirect("display_polls")
 
         choices = {vote.choice.pk: vote.choice for vote in votes}
-        return render(request, 'poll/my_votes.html', context={"choices": choices})
+
+        paginator = Paginator(list(choices.items()), 6)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+        return render(request, 'poll/my_votes.html', context={"page_obj": page_obj})
     
     choice = get_choice_obj(request) #Get the Choice object from the database
 

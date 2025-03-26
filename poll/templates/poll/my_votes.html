@@ -1,9 +1,9 @@
-{% extends 'poll/base.html' %}
+{% extends 'poll/ext_paginator.html' %}
 
 {% block content %}
 <div class="container mt-5">
     <!-- Poll Card -->
-    {% for choice_id, choice in choices.items %}
+    {% for choice_id, choice in page_obj %}
     <div class="card poll-card shadow-sm mb-4 d-flex flex-column">
       <div class="card-body d-flex flex-column">
         <form action="{% url 'my_votes' %}" method="post">

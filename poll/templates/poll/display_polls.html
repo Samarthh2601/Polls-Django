@@ -1,53 +1,47 @@
-{% extends 'poll/base.html' %}
+{% extends 'poll/ext_paginator.html' %}
 
 
 {% block content %}
 
-  <div class="container mt-5">
-    <!-- Poll Card -->
-    {% for poll in polls %}
-    <div class="card poll-card shadow-sm mb-4 d-flex flex-column">
-      <div class="card-body d-flex flex-column">
-        <form action="{% url 'vote' %}" method="post">
-          {% csrf_token %}
+<div class="container mt-5">
+  <!-- Poll Cards -->
+  {% for poll in page_obj %}
+  <div class="card poll-card shadow-sm mb-4 d-flex flex-column">
+    <div class="card-body d-flex flex-column">
+      <form action="{% url 'vote' %}" method="post">
+        {% csrf_token %}
         <!-- Poll Title -->
         <h3 class="card-title text-primary">{{ poll.text }}</h3>
-        <!-- Poll Creator -->
         <h6 class="card-subtitle mb-4">Created by: <strong>{{ poll.owner.username }}</strong></h6>
+        
         <!-- Poll Choices -->
         <div class="list-group d-flex flex-column gap-2">
-          
-            <div class="list-group">
-              {% for choice_id, value in poll.get_vote_count.items %} 
-              <!-- Poll Choice button loop -->
+          <div class="list-group">
+            {% for choice_id, value in poll.get_vote_count.items %} 
               <button type="button" class="list-group-item list-group-item-action choice-btn btn" 
                       onclick="selectChoice('{{ choice_id }}', this, '{{ poll.pk }}')"> 
-                  {{ value.0 }} | <strong>{{ value.1 }}</strong>
+                {{ value.0 }} | <strong>{{ value.1 }}</strong>
               </button>
-          {% endfor %}
+            {% endfor %}
           </div>
           
-          <!-- Hidden input with unique ID -->
           <input type="hidden" name="selected_choice_id" id="selectedChoice-{{ poll.pk }}">
           <input type="hidden" name="poll_key" value="{{ poll.pk }}">
 
-
           <button type="submit" class="btn btn-primary mt-2 vote-btn" disabled>Vote</button>
-    
-          </form>
-          <!-- Button to remove the selected choice -->
-          <button type="button" class="btn btn-outline-dark mt-2" onclick="removeSelected(this, '{{ poll.pk }}')">Clear</button>
+        </form>
 
-          {% block ext %}{% endblock ext %}
+        <button type="button" class="btn btn-outline-dark mt-2" onclick="removeSelected(this, '{{ poll.pk }}')">Clear</button>
 
-        </div>
-      </div>
-      <div class="card-footer mt-auto text-end">
-        <small class="text-muted">Poll ends at: {{ poll.end_date }} (UTC)</small>
+        {% block ext %}{% endblock ext %}
       </div>
     </div>
-    {% endfor %}
+    <div class="card-footer mt-auto text-end">
+      <small class="text-muted">Poll ends at: {{ poll.end_date }} (UTC)</small>
+    </div>
   </div>
+  {% endfor %}
+</div>
 
   <script>
     function selectChoice(choice, button, pollId) {
