@@ -20,7 +20,7 @@
             {% for choice_id, value in poll.get_vote_count.items %} 
               <button type="button" class="list-group-item list-group-item-action choice-btn btn" 
                       onclick="selectChoice('{{ choice_id }}', this, '{{ poll.pk }}')"> 
-                {{ value.0 }} | <strong>{{ value.1 }}</strong>
+                {{ value.0 }} | <strong>{{ value.2 }}%</strong>
               </button>
             {% endfor %}
           </div>
@@ -31,7 +31,7 @@
           <button type="submit" class="btn btn-primary mt-2 vote-btn" disabled>Vote</button>
         </form>
 
-        <button type="button" class="btn btn-outline-dark mt-2" onclick="removeSelected(this, '{{ poll.pk }}')">Clear</button>
+        <button type="button" class="btn btn-outline-dark mt-2 clear-btn" onclick="removeSelected(this, '{{ poll.pk }}')">Clear</button>
 
         {% block ext %}{% endblock ext %}
       </div>

@@ -12,8 +12,7 @@ from django.forms import modelformset_factory
 from datetime import datetime
 from django.core.paginator import Paginator
 
-
-
+# Helper function for add_vote and my_votes views
 def get_choice_obj(request: HttpRequest, use_id=True):
     choice_voted = request.POST.get("selected_choice") # Get the selected choice text from the hidden input [poll/display_polls.html]
     key = request.POST.get("poll_key") #Get the primary key of the selected poll from the hidden input [poll/display_polls.html]
@@ -41,6 +40,7 @@ def get_choice_obj(request: HttpRequest, use_id=True):
 
     return choice
 
+# Helper function for edit_poll, delete_poll and view_poll views
 def get_valid_poll(request, poll_key: int) -> Poll | bool:
     if poll_key is None:
         messages.error(request, "Invalid poll detected")
@@ -70,12 +70,18 @@ def display_polls(request: HttpRequest):
 
 @login_required
 def display_expired_polls(request: HttpRequest):
-    polls = polls = list(reversed(Poll.get_polls(active=False)))
-    return render(request, 'poll/display_polls.html', context={"polls": polls})
+    polls = polls = Poll.get_polls(active=False).order_by("-pub_date")
+
+    paginator = Paginator(polls, 6)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'poll/display_polls.html', context={"page_obj": page_obj})
 
 
 @login_required
 def create_poll(request: HttpRequest):
+
     if request.method == "POST":
         question = request.POST.get("question")
         deadline = request.POST.get("deadline")
@@ -145,6 +151,15 @@ def delete_poll(request: HttpRequest):
     poll.delete()
     return redirect("my_polls")
 
+@login_required
+def view_poll(request: HttpRequest):
+    poll_key = request.GET.get("poll_key")
+    poll = get_valid_poll(request, poll_key)
+    
+    if poll is False:
+        return redirect("display_polls")
+
+    return render(request, "poll/view_poll.html", context={"poll": poll})
 
 # --------------USER SPECIFIC VIEWS-------------------------
 

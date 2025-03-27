@@ -18,8 +18,15 @@ class Poll(models.Model):
 
     def get_vote_count(self) -> dict:
         choices_with_vote_counts = self.choices.annotate(vote_count=Count('votes'))
-        result = {str(choice.pk): [choice.text, choice.vote_count] for choice in choices_with_vote_counts}
+        total_votes = sum(choice.vote_count for choice in choices_with_vote_counts)
+        
+        result = {}
+        for choice in choices_with_vote_counts:
+            percentage = (choice.vote_count / total_votes * 100) if total_votes > 0 else 0
+            result[str(choice.pk)] = [choice.text, choice.vote_count, round(percentage, 2)]
+        
         return result
+
     
     @staticmethod
     def get_polls(active=True):

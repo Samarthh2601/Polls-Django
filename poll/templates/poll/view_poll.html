@@ -1,0 +1,38 @@
+{% extends 'poll/base.html' %} 
+
+{% block content %}
+
+<div class="container py-5">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="card-body position-relative">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h1 class="card-title">{{ poll.text }}</h1>
+                        <p class="text-muted">Owned by: {{ poll.owner }}</p>
+                    </div>
+                    <div>
+                        <a href="{% url 'edit_poll' %}?poll_key={{ poll.pk }}" class="btn btn-info mt-2" onclick="return confirm('Are you sure you want to edit this poll?');">Edit</a>
+                        <a href="{% url 'delete_poll' %}?poll_key={{ poll.pk }}" class="btn btn-danger mt-2" onclick="return confirm('Are you sure you want to delete this poll?');">Delete</a>
+                    </div>
+                </div>
+            <hr>
+            <h5>Choices:</h5>
+            <ul class="list-group list-group-flush">
+                {% for choice_id, value in poll.get_vote_count.items %} 
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ value.0 }}</strong><br>
+                        <small class="text-muted">{{ value.2 }}% of votes</small>
+                    </div>
+                    <span class="badge bg-primary rounded-pill">{{ value.1 }} votes</span>
+                </li>
+                {% empty %}
+                    <li class="list-group-item text-muted">No choices available.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
