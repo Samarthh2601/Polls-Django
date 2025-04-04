@@ -30,8 +30,6 @@ def get_choice_obj(request: HttpRequest, use_id=True):
 
     if poll.end_date <= timezone.now():
         messages.error(request, "Poll has already ended.")
-        poll.active = False
-        poll.save()
         return False
     
     if use_id is True:
@@ -159,7 +157,9 @@ def view_poll(request: HttpRequest):
     if poll is False:
         return redirect("display_polls")
 
-    return render(request, "poll/view_poll.html", context={"poll": poll})
+    expired = True if poll.end_date <= timezone.now() else False
+
+    return render(request, "poll/view_poll.html", context={"poll": poll, "expired": expired})
 
 # --------------USER SPECIFIC VIEWS-------------------------
 
@@ -220,3 +220,31 @@ def add_vote(request: HttpRequest):
 
     messages.success(request, "Successfully voted!")
     return redirect("display_polls")
+
+@login_required
+def search(request: HttpRequest):
+    if request.method == "GET":
+        search_type = request.GET.get("search_type")
+
+        search_query = request.GET.get("search_query")
+        if not search_query or not search_type:
+            messages.error(request, "Please enter a valid query")
+            return redirect("display_polls")
+
+        if search_type == "poll":
+            polls = Poll.objects.filter(text__icontains=search_query).order_by("-pub_date")
+
+        elif search_type == "choice":
+            polls = Poll.objects.filter(choices__text__icontains=search_query).distinct().order_by("-pub_date")
+        
+        elif search_type == "user":
+            polls = Poll.objects.filter(owner__username__icontains=search_query).order_by("-pub_date")
+
+        paginator = Paginator(polls, 6)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+        return render(request, 'poll/display_polls.html', context={"page_obj": page_obj})
+    else:
+        messages.error(request, "Invalid request method")
+        return redirect("display_polls")

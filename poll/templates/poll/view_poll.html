@@ -19,7 +19,7 @@
             <hr>
             <h5>Choices:</h5>
             <ul class="list-group list-group-flush">
-                {% for choice_id, value in poll.get_vote_count.items %} 
+                {% for choice_id, value in poll.get_vote_count.items %}
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     <div>
                         <strong>{{ value.0 }}</strong><br>
@@ -31,6 +31,9 @@
                     <li class="list-group-item text-muted">No choices available.</li>
                 {% endfor %}
             </ul>
+            <div class="card-footer text-muted text-center">
+                Poll ends at: {{ poll.end_date }} | Expired: {{ expired }}
+            </div>
         </div>
     </div>
 </div>
